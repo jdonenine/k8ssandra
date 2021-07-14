@@ -20,7 +20,7 @@
 | file://../cass-operator | cass-operator | 0.29.4 |
 | file://../k8ssandra-common | k8ssandra-common | 0.28.3 |
 | file://../medusa-operator | medusa-operator | 0.30.1 |
-| file://../reaper-operator | reaper-operator | 0.31.0 |
+| file://../reaper-operator | reaper-operator | 0.32.0 |
 | https://prometheus-community.github.io/helm-charts | kube-prometheus-stack | 12.11.3 |
 
 ## Values
@@ -29,7 +29,7 @@
 |-----|------|---------|-------------|
 | cassandra.enabled | bool | `true` | Enables installation of Cassandra cluster. Set to false if you only wish to install operators. |
 | cassandra.version | string | `"3.11.10"` | The Cassandra version to use. The supported versions include the following:    - 3.11.7    - 3.11.8    - 3.11.9    - 3.11.10    - 4.0.0 |
-| cassandra.versionImageMap | object | `{"3.11.10":"k8ssandra/cass-management-api:3.11.10-v0.1.25","3.11.7":"k8ssandra/cass-management-api:3.11.7-v0.1.25","3.11.8":"k8ssandra/cass-management-api:3.11.8-v0.1.25","3.11.9":"k8ssandra/cass-management-api:3.11.9-v0.1.25","4.0.0":"k8ssandra/cass-management-api:4.0.0-v0.1.25"}` | Specifies the image to use for a particular Cassandra version. Exercise care and caution with changing these values! cass-operator is not designed to work with arbitrary Cassandra images. It expects the cassandra container to be running management-api images. If you do want to change one of these mappings, the new value should be a management-api image. |
+| cassandra.versionImageMap | object | `{"3.11.10":"k8ssandra/cass-management-api:3.11.10-v0.1.26","3.11.7":"k8ssandra/cass-management-api:3.11.7-v0.1.26","3.11.8":"k8ssandra/cass-management-api:3.11.8-v0.1.26","3.11.9":"k8ssandra/cass-management-api:3.11.9-v0.1.26","4.0.0":"k8ssandra/cass-management-api:4.0.0-v0.1.26"}` | Specifies the image to use for a particular Cassandra version. Exercise care and caution with changing these values! cass-operator is not designed to work with arbitrary Cassandra images. It expects the cassandra container to be running management-api images. If you do want to change one of these mappings, the new value should be a management-api image. |
 | cassandra.image | object | `{}` | Overrides the default image mappings. This is intended for advanced use cases like development or testing. By default the Cassandra version has to be one that is in versionImageMap. Template rendering will fail if the version is not in the map. When you set the image directly, the version mapping check is skipped. Note that you are still constrained to the versions supported by cass-operator. |
 | cassandra.configBuilder | object | `{"image":{"pullPolicy":"IfNotPresent","registry":"docker.io","repository":"datastax/cass-config-builder","tag":"1.0.4"}}` | The server-config-init init container |
 | cassandra.configBuilder.image.registry | string | `"docker.io"` | Container registry for the config builder |
@@ -116,7 +116,7 @@
 | reaper.enabled | bool | `true` | Enable Reaper resources as part of this release. Note that Reaper uses Cassandra's JMX APIs to perform repairs. When Reaper is enabled, Cassandra will also be configured to allow remote JMX access. JMX authentication will be configured in Cassandra with credentials only created for Reaper in order to limit access. |
 | reaper.image.reigistry | string | `"docker.io"` | Image registry for reaper |
 | reaper.image.repository | string | `"thelastpickle/cassandra-reaper"` | Image repository for reaper |
-| reaper.image.tag | string | `"2.2.5"` | Tag of the reaper image to pull from |
+| reaper.image.tag | string | `"2.3.1"` | Tag of the reaper image to pull from |
 | reaper.image.pullPolicy | string | `"IfNotPresent"` | Pull policy for the reaper container |
 | reaper.cassandraUser | object | `{"secret":"","username":""}` | Configures the Cassandra user used by Reaper when authentication is enabled. If neither cassandraUser.secret nor cassandraUser.username are set, then a Cassandra user and a secret with the user's credentials will be created. The username will be reaper. The secret name will be of the form {clusterName}-reaper. The password will be a random 20 character password. If cassandraUser.secret is set, then the Cassandra user will be created from the contents of the secret. If cassandraUser.secret is not set and if cassandraUser.username is set, a secret will be generated using the specified username. The password will be generated as previously described. |
 | reaper.jmx | object | `{"secret":"","username":""}` | Configures JMX access to the Cassandra cluster. Reaper requires remote JMX access to perform repairs. The Cassandra cluster will be configured with remote JMX access enabled when Reaper is deployed. The JMX access will be configured to use authentication. If neither `jmx.secret` nor `jmx.username` are set, then a default user and secret with the user's credentials will be created. |
@@ -134,7 +134,7 @@
 | medusa.image.pullPolicy | string | `"IfNotPresent"` | Pull policy for the medusa container |
 | medusa.cassandraUser | object | `{"secret":"","username":""}` | Configures the Cassandra user used by Medusa when authentication is enabled. If neither `cassandraUser.secret` nor `cassandraUser.username` are set, then a Cassandra user and a secret will be created. The username will be medusa. The secret name will be of the form {clusterName}-medusa. The password will be a random 20 character password. If `cassandraUser.secret` is set, then the Cassandra user will be created from the contents of the secret. If `cassandraUser.secret` is not set and if `cassandraUser.username` is set, a secret will be generated using the specified username. The password will be generated as previously described. |
 | medusa.multiTenant | bool | `false` | Enables usage of a bucket across multiple clusters. |
-| medusa.storage | string | `"s3"` | API interface used by the object store. Supported values include `s3`, 's3_compatible' and `gcs`. For file system storage, i.e., a pod volume mount, use 'local' and set the podStorage properties. Note that 'local' does not necessarily  imply a local volume. It could also be network attached storage. It is simply accessed through the file system. |
+| medusa.storage | string | `"s3"` | API interface used by the object store. Supported values include `s3`, 's3_compatible', `google_storage` and 'azure_blobs'. For file system storage, i.e., a pod volume mount, use 'local' and set the podStorage properties. Note that 'local' does not necessarily  imply a local volume. It could also be network attached storage. It is simply accessed through the file system. |
 | medusa.storage_properties | object | `{}` | Optional properties for storage. Supported values depend on the type of the storage. |
 | medusa.bucketName | string | `"awstest"` |  |
 | medusa.storageSecret | string | `"medusa-bucket-key"` | Name of the Kubernetes `Secret` that stores the key file for the storage provider's API. If using 'local' storage, this value is ignored. |
